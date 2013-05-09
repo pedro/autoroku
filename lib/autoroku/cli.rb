@@ -17,6 +17,20 @@ class Autoroku::CLI
   def run(*args)
     cmd = args.first.first
     method = cmd.gsub(":", "_")
+
+    if cmd == "help"
+      display "Usage: autoroku [command]"
+      (@api.public_methods - Object.methods).sort.each do |method|
+        cmd = method.to_s.gsub("_", ":")
+        display "  #{cmd}"
+      end
+      exit 0
+    end
+
+    unless @api.respond_to?(method)
+      display "Unknown command: #{cmd}"
+    end
+
     if @api.respond_to?(method)
       response = @api.send(method)
 
