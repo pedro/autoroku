@@ -8,6 +8,12 @@ describe Autoroku do
 
   it "gets account info" do
     @api.account_info
-    assert_requested :get, "https://api.heroku.com/account"
+    assert_requested(:get, "https://api.heroku.com/account")
+  end
+
+  it "updates accounts" do
+    @api.account_update(allow_tracking: false)
+    assert_requested(:patch, "https://api.heroku.com/account",
+      :query => { allow_tracking: false })
   end
 end

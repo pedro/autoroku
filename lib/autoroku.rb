@@ -30,11 +30,20 @@ class Autoroku
     spec["resources"].each do |resource, resource_spec|
       resource_spec["actions"].each do |action, action_spec|
         method_name = "#{resource}_#{action}".downcase
-        define_singleton_method(method_name) do
+        define_singleton_method(method_name) do |*args|
+          options          = args.first || {}
+          accepted_options = (action_spec["attributes"] || {}).values.flatten
+          unknown_options  = options.keys.map(&:to_sym) - accepted_options.map(&:to_sym)
+
+          unless unknown_options.empty?
+            raise ArgumentError, "Unexpected options: #{unknown_options.inspect}"
+          end
+
           @connection.request(
             method:  action_spec["method"],
             path:    action_spec["path"],
-            expects: action_spec["status"].to_i)
+            expects: action_spec["status"].to_i,
+            query:   options)
         end
       end
     end
