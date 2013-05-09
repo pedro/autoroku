@@ -23,11 +23,13 @@ class Autoroku
     parse_api_spec!(options[:api_spec] || "lib/api.json")
   end
 
+  protected
+
   def parse_api_spec!(path)
     raw  = File.read(path)
-    spec = Yajl::Parser.parse(raw)
+    @spec = Yajl::Parser.parse(raw)
 
-    spec["resources"].each do |resource, resource_spec|
+    @spec["resources"].each do |resource, resource_spec|
       resource_spec["actions"].each do |action, action_spec|
         method_name = "#{resource}_#{action}".downcase
         define_singleton_method(method_name) do |*args|
@@ -39,11 +41,13 @@ class Autoroku
             raise ArgumentError, "Unexpected options: #{unknown_options.inspect}"
           end
 
-          @connection.request(
+          response = @connection.request(
             method:  action_spec["method"],
             path:    action_spec["path"],
             expects: action_spec["status"].to_i,
             query:   options)
+
+          Yajl::Parser.parse(response.body)
         end
       end
     end

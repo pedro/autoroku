@@ -7,8 +7,9 @@ describe Autoroku do
   end
 
   it "gets account info" do
-    @api.account_info
-    assert_requested(:get, "https://api.heroku.com/account")
+    stub_request(:get, "https://api.heroku.com/account").
+      to_return(:body => Yajl::Encoder.encode("foo" => "bar"))
+    @api.account_info.must_equal("foo" => "bar")
   end
 
   it "updates accounts" do
