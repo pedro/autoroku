@@ -2,9 +2,14 @@ class Autoroku::Spec
   attr_accessor :api, :resources
 
   def initialize(api)
-    @api = api
+    @api = read_api_spec(api)
     @resources = []
     parse!
+  end
+
+  def read_api_spec(api)
+    return api if api.is_a?(Hash)
+    Yajl::Parser.parse(File.read(api))
   end
 
   def parse!

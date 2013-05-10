@@ -20,8 +20,7 @@ class Autoroku
 
     url = options[:url] || "https://api.heroku.com"
     @connection = Excon.new(url, options)
-    api_spec = File.read(options[:api_spec] || "lib/api.json")
-    @spec       = Autoroku::Spec.new(Yajl::Parser.parse(api_spec))
+    @spec = Autoroku::Spec.new(options[:api_spec] || "lib/api.json")
     build!
   end
 
