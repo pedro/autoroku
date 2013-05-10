@@ -27,4 +27,8 @@ describe Autoroku::Builder do
     assert_equal "autoroku-test", spec.name
     assert_equal Gem::Version.new("0.0.1"), spec.version
   end
+
+  it "creates a module for each resource" do
+    res = File.read("build/lib/heroku/api/account.rb")
+  end
 end

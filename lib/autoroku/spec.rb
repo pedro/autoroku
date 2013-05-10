@@ -39,6 +39,10 @@ class Autoroku::Spec
       @name    = options[:name]
       @actions = options[:actions] || []
     end
+
+    def system_name
+      @name.downcase.gsub(" ", "_")
+    end
   end
 
   class Action
