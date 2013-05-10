@@ -36,14 +36,15 @@ class Autoroku::Builder
 
   def create_resource_file(resource)
     render_template("resource_module.txt.erb", 
-      "lib/heroku/api/#{resource.system_name}.rb")
+      "lib/heroku/api/#{resource.system_name}.rb",
+      resource: resource)
   end
 
-  def render_template(template_path, destination_path)
+  def render_template(template_path, destination_path, extra_vars={})
     contents = File.read("template/#{template_path}")
     template = Erubis::Eruby.new(contents)
     File.open("build/#{destination_path}", "w") do |file|
-      file.puts template.result(erb_variables)
+      file.puts template.result(erb_variables.merge(extra_vars))
     end
   end
 
