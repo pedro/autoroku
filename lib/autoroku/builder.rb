@@ -16,6 +16,8 @@ class Autoroku::Builder
   def render_readme
     template = File.read("template/README.md.erb")
     readme = Erubis::Eruby.new(template)
-    puts readme.result(spec: spec)
+    File.open("build/README.md", "w") do |file|
+      file.puts readme.result(spec: spec)
+    end
   end
 end
