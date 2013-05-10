@@ -1,8 +1,13 @@
-class Autoroku::Builder
-  attr_accessor :path
+require "fileutils"
 
-  def initialize(options)
-    path = options[:path]
+class Autoroku::Builder
+  attr_accessor :spec
+
+  def initialize(spec)
+    spec = spec
   end
 
+  def run
+    FileUtils.mkdir_p 'build'
+  end
 end
