@@ -2,23 +2,7 @@ require "test_helper"
 
 describe Autoroku::Spec do
   before do
-    @api  = {
-      "resources" => {
-        "Account" => {
-          "actions" => {
-            "Update" => {
-              "method" => "PATCH",
-              "path"   => "/account",
-              "status" => "200 OK",
-              "attributes" => {
-                "optional" => %w( allow_tracking beta email )
-              }
-            }
-          }
-        }
-      }
-    }
-    @spec = Autoroku::Spec.new(@api)
+    @spec = Autoroku::Spec.new("test/resources/api.json")
   end
 
   it "parses resources" do

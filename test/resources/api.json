@@ -1,0 +1,82 @@
+{
+  "overview": {
+    "Authentication":   "HTTP basic authentication should be supplied for each request. The value should be constructed from email address and api key as `{email}:{api-key}`. This userpass should then be base64 encoded and passed in the Authorization header, for example `Authorization: Basic 0123456789ABCDEF=`."
+  },
+  "resources": {
+
+    "Account": {
+      "actions": {
+        "Update": {
+          "attributes": {
+            "optional": [
+              "allow_tracking",
+              "beta",
+              "email"
+            ]
+          },
+          "method": "PATCH",
+          "path":   "/account",
+          "status": "200 OK"
+        }
+      },
+      "attributes": {
+        "allow_tracking": {
+          "description":  "whether to allow web activity tracking with third-party services like Google Analytics",
+          "example":      true,
+          "type":         "boolean"
+        },
+        "beta": {
+          "description":  "whether to utilize beta Heroku features",
+          "example":      false,
+          "type":         "boolean"
+        },
+        "confirmed": {
+          "description":  "whether billing has been confirmed",
+          "example":      false,
+          "type":         "boolean"
+        },
+        "created_at": {
+          "description":  "when account was created",
+          "example":      "2012-01-01T12:00:00-00:00",
+          "type":         "datetime"
+        },
+        "email": {
+          "description":  "email address of account",
+          "example":      "username@example.com",
+          "type":         "string"
+        },
+        "id": {
+          "description":  "unique identifier of account",
+          "example":      "01234567-89ab-cdef-0123-456789abcdef",
+          "type":         "uuid"
+        },
+        "last_login": {
+          "description":  "when account last authorized with Heroku",
+          "example":      "2012-01-01T12:00:00-00:00",
+          "type":         "datetime"
+        },
+        "updated_at": {
+          "description":  "when account was updated",
+          "example":      "2012-01-01T12:00:00-00:00",
+          "type":         "datetime"
+        },
+        "verified": {
+          "description":  "whether email has been verified",
+          "example":      false,
+          "type":         "boolean"
+        }
+      },
+      "description": "An account represents you on Heroku.",
+      "serialization": [
+        "allow_tracking",
+        "beta",
+        "confirmed",
+        "email",
+        "id",
+        "last_login",
+        "updated_at",
+        "verified"
+      ]
+    }
+  }
+}

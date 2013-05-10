@@ -10,6 +10,7 @@ class Autoroku::Builder
 
   def run
     FileUtils.mkdir_p 'build'
+    FileUtils.mkdir_p 'build/lib/heroku/api'
     render_readme
   end
 
