@@ -16,4 +16,8 @@ describe Autoroku::Builder do
     assert readme.include?("Heroku.rb"), "includes header"
     assert readme.include?("Account"),   "includes resource info"
   end
+
+  it "creates a Gemfile" do
+    assert_equal File.read("template/Gemfile"), File.read("build/Gemfile")
+  end
 end
