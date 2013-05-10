@@ -20,11 +20,7 @@ class Autoroku::Builder
   end
 
   def create_readme
-    template = File.read("template/README.md.erb")
-    readme = Erubis::Eruby.new(template)
-    File.open("build/README.md", "w") do |file|
-      file.puts readme.result(erb_variables)
-    end
+    render_template("README.md.erb", "README.md")
   end
 
   def create_gemfile
@@ -32,10 +28,14 @@ class Autoroku::Builder
   end
 
   def create_gemspec
-    template = File.read("template/gemspec.txt.erb")
-    gemspec = Erubis::Eruby.new(template)
-    File.open("build/#{gem_name}.gemspec", "w") do |file|
-      file.puts gemspec.result(erb_variables)
+    render_template("gemspec.txt.erb", "#{gem_name}.gemspec")
+  end
+
+  def render_template(template_path, destination_path)
+    contents = File.read("template/#{template_path}")
+    template = Erubis::Eruby.new(contents)
+    File.open("build/#{destination_path}", "w") do |file|
+      file.puts template.result(erb_variables)
     end
   end
 
