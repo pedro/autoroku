@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+
+require "autoroku"
+require "autoroku/builder"
+
+Autoroku::Builder.new(:path => "lib/api.json").run

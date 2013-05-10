@@ -20,21 +20,20 @@ class Autoroku
 
     url = options[:url] || "https://api.heroku.com"
     @connection = Excon.new(url, options)
-    parse_api_spec!(options[:api_spec] || "lib/api.json")
+    api_spec = File.read(options[:api_spec] || "lib/api.json")
+    @spec       = Autoroku::Spec.new(Yajl::Parser.parse(api_spec))
+    build!
   end
 
   protected
 
-  def parse_api_spec!(path)
-    raw  = File.read(path)
-    @spec = Yajl::Parser.parse(raw)
-
-    @spec["resources"].each do |resource, resource_spec|
-      resource_spec["actions"].each do |action, action_spec|
-        method_name = "#{resource}_#{action}".downcase
+  def build!
+    @spec.resources.each do |resource|
+      resource.actions.each do |action|
+        method_name = "#{resource.name}_#{action.name}".downcase
         define_singleton_method(method_name) do |*args|
           options          = args.first || {}
-          accepted_options = (action_spec["attributes"] || {}).values.flatten
+          accepted_options = action.attributes
           unknown_options  = options.keys.map(&:to_sym) - accepted_options.map(&:to_sym)
 
           unless unknown_options.empty?
@@ -42,9 +41,9 @@ class Autoroku
           end
 
           response = @connection.request(
-            method:  action_spec["method"],
-            path:    action_spec["path"],
-            expects: [action_spec["status"].to_i, 206],
+            method:  action.method,
+            path:    action.path,
+            expects: [action.status, 206],
             query:   options)
 
           Yajl::Parser.parse(response.body)
@@ -54,3 +53,5 @@ class Autoroku
   end
 
 end
+
+require "autoroku/spec"
