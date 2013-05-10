@@ -3,7 +3,8 @@ require "test_helper"
 describe Autoroku::Builder do
   before do
     @spec = Autoroku::Spec.new("test/resources/api.json")
-    @builder = Autoroku::Builder.new(@spec)
+    @builder = Autoroku::Builder.new(
+      spec: @spec, name: "autoroku-test", version: "0.0.1")
     @builder.run
   end
 
@@ -19,5 +20,11 @@ describe Autoroku::Builder do
 
   it "creates a Gemfile" do
     assert_equal File.read("template/Gemfile"), File.read("build/Gemfile")
+  end
+
+  it "creates a valid gemspec" do
+    spec = Gem::Specification.load("build/autoroku-test.gemspec")
+    assert_equal "autoroku-test", spec.name
+    assert_equal Gem::Version.new("0.0.1"), spec.version
   end
 end

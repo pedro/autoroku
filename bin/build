@@ -5,4 +5,4 @@ require "autoroku"
 require "autoroku/builder"
 
 spec = Autoroku::Spec.new("lib/api.json")
-Autoroku::Builder.new(spec).run
+Autoroku::Builder.new(spec: spec).run
