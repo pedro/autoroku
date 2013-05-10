@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     autoroku (0.0.1)
+      erubis (~> 2.7.0)
       excon (~> 0.20.0)
       netrc (~> 0.7.7)
       yajl-ruby (~> 1.1.0)
@@ -11,6 +12,7 @@ GEM
   specs:
     addressable (2.3.4)
     crack (0.3.2)
+    erubis (2.7.0)
     excon (0.20.1)
     minitest (4.7.3)
     netrc (0.7.7)

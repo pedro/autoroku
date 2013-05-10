@@ -52,5 +52,9 @@ class Autoroku::Spec
       @status   = options[:status]
       @attributes = options[:attributes]
     end
+
+    def method_name
+      "#{resource.name.downcase}_#{name.downcase}"
+    end
   end
 end
