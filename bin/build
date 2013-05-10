@@ -3,6 +3,24 @@
 
 require "autoroku"
 require "autoroku/builder"
+require "optparse"
 
-spec = Autoroku::Spec.new("lib/api.json")
-Autoroku::Builder.new(spec: spec).run
+ARGV.options do |o|
+  o.set_summary_indent("  ")
+  o.banner = "Usage: bin/#{File.basename(__FILE__)} [options]"
+
+  options = { name: nil, version: nil }
+  spec_path = "lib/api.json"
+
+  o.on("-n", "--name GEM_NAME", "gem name") { |n| options[:name] = n }
+  o.on("-v", "--version VERSION", "gem version") { |v| options[:version] = v }
+  o.on("-s", "--spec PATH_TO_SPEC", "use custom API spec json") { |s| spec_path = s }
+
+  o.parse!
+
+  options[:spec] = Autoroku::Spec.new(spec_path)
+  builder = Autoroku::Builder.new(options)
+  builder.run
+  puts "Built #{builder.gem_name} #{builder.gem_version} in ./build"
+end
+

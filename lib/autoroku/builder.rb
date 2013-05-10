@@ -11,6 +11,7 @@ class Autoroku::Builder
   end
 
   def run
+    FileUtils.rm_rf 'build'
     FileUtils.mkdir_p 'build'
     FileUtils.mkdir_p 'build/lib/heroku/api'
     create_readme
