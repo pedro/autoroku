@@ -5,12 +5,12 @@
   "resources": {
     "Foo Bar": {
       "actions": {
-        "Update": {
+        "Create": {
           "attributes": {
             "required": ["r1", "r2"],
             "optional": ["o1"]
           },
-          "method": "PATCH",
+          "method": "POST",
           "path":   "/foo-bar",
           "status": "200 OK"
         }

@@ -42,29 +42,29 @@ describe Autoroku::Builder do
     end
 
     it "defines methods after the actions" do
-      assert @api.respond_to?(:foo_bar_update), "responds to foo_bar_update"
+      assert @api.respond_to?(:foo_bar_create), "responds to foo_bar_update"
     end
 
     it "requires params" do
-      lambda { @api.foo_bar_update }.must_raise ArgumentError
+      lambda { @api.foo_bar_create }.must_raise ArgumentError
     end
 
     it "identifies invalid params" do
-      lambda { @api.foo_bar_update(wrong: true) }.must_raise ArgumentError
+      lambda { @api.foo_bar_create(wrong: true) }.must_raise ArgumentError
     end
 
     it "enforces required params" do
-      lambda { @api.foo_bar_update(r1: "foo") }.must_raise ArgumentError
+      lambda { @api.foo_bar_create(r1: "foo") }.must_raise ArgumentError
     end
 
     it "makes a request according to the spec" do
-      @api.foo_bar_update(r1: "foo", r2: "bar")
-      assert_requested(:patch, "https://api.heroku.com/foo-bar",
+      @api.foo_bar_create(r1: "foo", r2: "bar")
+      assert_requested(:post, "https://api.heroku.com/foo-bar",
         query: { r1: "foo", r2: "bar" })
     end
 
     it "comments on the method signature" do
-      assert File.read(@path).include?("# PATCH /foo-bar")
+      assert File.read(@path).include?("# POST /foo-bar")
     end
   end
 end

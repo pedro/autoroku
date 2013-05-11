@@ -14,8 +14,8 @@ describe Autoroku::Spec do
     res    = @spec.resources.first
     action = res.actions.first
     assert_equal 1, res.actions.size
-    assert_equal "Update", action.name
-    assert_equal "PATCH", action.method
+    assert_equal "Create", action.name
+    assert_equal "POST", action.method
     assert_equal "/foo-bar", action.path
     assert_equal 200, action.status
     assert_equal %w( r1 r2 o1 ), action.attributes.map(&:name)
