@@ -35,7 +35,8 @@ describe Autoroku::Builder do
 
   describe "generated API" do
     before do
-      require "./build/lib/heroku/api.rb"
+      @path = "./build/lib/heroku/api.rb"
+      require @path
       @api = Heroku::API.new
       stub_request(:any, %r{https://api.heroku.com/foo-bar*})
     end
@@ -60,6 +61,10 @@ describe Autoroku::Builder do
       @api.foo_bar_update(r1: "foo", r2: "bar")
       assert_requested(:patch, "https://api.heroku.com/foo-bar",
         query: { r1: "foo", r2: "bar" })
+    end
+
+    it "comments on the method signature" do
+      assert File.read(@path).include?("# PATCH /foo-bar")
     end
   end
 end

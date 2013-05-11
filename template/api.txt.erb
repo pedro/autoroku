@@ -103,6 +103,7 @@ module Heroku
   <% resource.actions.each do |action| %>
     <% method_signature = "" %>
     <% method_signature = "(options)" unless action.attributes.empty? %>
+    # <%= action.method %> <%= action.path %>
     def <%= action.method_name %><%= method_signature %>
       <% unless action.attributes.empty? %>
         unknown_options = options.keys.map(&:to_sym) - <%= action.attributes.map(&:name).map(&:to_sym).inspect %>
