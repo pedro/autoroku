@@ -37,6 +37,7 @@ describe Autoroku::Builder do
     before do
       require "./build/lib/heroku/api.rb"
       @api = Heroku::API.new
+      stub_request(:any, %r{https://api.heroku.com/foo-bar*})
     end
 
     it "defines methods after the actions" do
@@ -53,6 +54,12 @@ describe Autoroku::Builder do
 
     it "enforces required params" do
       lambda { @api.foo_bar_update(r1: "foo") }.must_raise ArgumentError
+    end
+
+    it "makes a request according to the spec" do
+      @api.foo_bar_update(r1: "foo", r2: "bar")
+      assert_requested(:patch, "https://api.heroku.com/foo-bar",
+        query: { r1: "foo", r2: "bar" })
     end
   end
 end

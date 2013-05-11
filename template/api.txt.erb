@@ -114,6 +114,11 @@ module Heroku
         missing_required = required_options - options.keys.map(&:to_sym)
         raise ArgumentError, "Missing: #{missing_required.inspect}" unless missing_required.empty?
       <% end %>
+      request(
+        :expects => <%= action.status %>,
+        :method  => "<%= action.method %>",
+        :path    => "<%= action.path %>",
+        :query   => options)
     end
   <% end %>
 <% end %>
