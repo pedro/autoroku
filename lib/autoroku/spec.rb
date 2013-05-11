@@ -13,14 +13,16 @@ class Autoroku::Spec
   end
 
   def parse!
-    @api["resources"].each do |resource, resource_spec|
+    @api["resources"].keys.sort.each do |resource|
+      resource_spec = @api["resources"][resource]
       @resources << parse_resource(resource, resource_spec)
     end
   end
 
   def parse_resource(name, spec)
     Resource.new(name: name).tap do |resource|
-      spec["actions"].each do |action, action_spec|
+      spec["actions"].keys.sort.each do |action|
+        action_spec = spec["actions"][action]
         attrs = action_spec["attributes"] || {}
         attrs_required = (attrs["required"] || [])
         attrs_optional = (attrs["optional"] || [])
