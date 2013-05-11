@@ -28,7 +28,12 @@ describe Autoroku::Builder do
     assert_equal Gem::Version.new("0.0.1"), spec.version
   end
 
-  it "creates api.rb" do
+  it "creates main rb file for the gem" do
+    assert_equal File.read("template/heroku-api.rb"),
+      File.read("build/lib/autoroku-test.rb")
+  end
+
+  it "creates heroku/api.rb" do
     require "./build/lib/heroku/api.rb"
     assert Heroku::API.new.respond_to?(:account_update)
   end

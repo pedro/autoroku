@@ -16,6 +16,7 @@ class Autoroku::Builder
     create_readme
     create_gemfile
     create_gemspec
+    create_heroku_api_dot_rb
     create_api_dot_rb
   end
 
@@ -29,6 +30,10 @@ class Autoroku::Builder
 
   def create_gemspec
     render_template("gemspec.txt.erb", "#{gem_name}.gemspec")
+  end
+
+  def create_heroku_api_dot_rb
+    FileUtils.copy("template/heroku-api.rb", "build/lib/#{gem_name}.rb")
   end
 
   def create_api_dot_rb
