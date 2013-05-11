@@ -57,8 +57,12 @@ class Autoroku::Spec
       @attributes = options[:attributes]
     end
 
+    def system_name
+      @name.downcase.gsub(" ", "_")
+    end
+
     def method_name
-      "#{resource.name.downcase}_#{name.downcase}"
+      "#{resource.system_name}_#{system_name}"
     end
   end
 end

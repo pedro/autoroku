@@ -15,7 +15,7 @@ describe Autoroku::Builder do
   it "creates README.md" do
     readme = File.read("build/README.md")
     assert readme.include?("Heroku.rb"), "includes header"
-    assert readme.include?("Account"),   "includes resource info"
+    assert readme.include?("Foo Bar"),   "includes resource info"
   end
 
   it "creates a Gemfile" do
@@ -35,6 +35,6 @@ describe Autoroku::Builder do
 
   it "creates heroku/api.rb" do
     require "./build/lib/heroku/api.rb"
-    assert Heroku::API.new.respond_to?(:account_update)
+    assert Heroku::API.new.respond_to?(:foo_bar_update)
   end
 end

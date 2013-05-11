@@ -7,7 +7,7 @@ describe Autoroku::Spec do
 
   it "parses resources" do
     assert_equal 1, @spec.resources.size
-    assert_equal "Account", @spec.resources.first.name
+    assert_equal "Foo Bar", @spec.resources.first.name
   end
 
   it "parses actions" do
@@ -16,8 +16,8 @@ describe Autoroku::Spec do
     assert_equal 1, res.actions.size
     assert_equal "Update", action.name
     assert_equal "PATCH", action.method
-    assert_equal "/account", action.path
+    assert_equal "/foo-bar", action.path
     assert_equal 200, action.status
-    assert_equal %w( allow_tracking beta email ), action.attributes
+    assert_equal %w( r1 r2 o1 ), action.attributes
   end
 end
