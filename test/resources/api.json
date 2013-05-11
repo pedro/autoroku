@@ -13,6 +13,14 @@
           "method": "POST",
           "path":   "/foo-bar",
           "status": "200 OK"
+        },
+        "Update": {
+          "attributes": {
+            "optional": ["r1", "r2", "o1"]
+          },
+          "method": "PATCH",
+          "path":   "/foo-bar/{foo-bar-id-or-name}",
+          "status": "200 OK"
         }
       },
       "attributes": {

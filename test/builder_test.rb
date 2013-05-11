@@ -66,5 +66,11 @@ describe Autoroku::Builder do
     it "comments on the method signature" do
       assert File.read(@path).include?("# POST /foo-bar")
     end
+
+    it "extracts ids from the path" do
+      @api.foo_bar_update(42, r1: "foo")
+      assert_requested(:patch, "https://api.heroku.com/foo-bar/42",
+        query: { r1: "foo" })
+    end
   end
 end

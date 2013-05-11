@@ -66,6 +66,14 @@ class Autoroku::Spec
       @attributes = options[:attributes]
     end
 
+    def path_ids
+      ids = []
+      path.gsub(/\{[\w\d-]+\}/) do |var|
+        ids << var.gsub("-", "_").gsub(/\{|\}/, "")
+      end
+      ids
+    end
+
     def system_name
       @name.downcase.gsub(" ", "_")
     end
