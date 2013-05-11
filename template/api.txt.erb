@@ -101,7 +101,9 @@ module Heroku
 
 <% spec.resources.each do |resource| %>
   <% resource.actions.each do |action| %>
-    def <%= action.method_name %>
+    <% method_signature = "" %>
+    <% method_signature = "(options)" unless action.attributes.empty? %>
+    def <%= action.method_name %><%= method_signature %>
     end
   <% end %>
 <% end %>

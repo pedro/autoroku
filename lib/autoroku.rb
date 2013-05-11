@@ -32,7 +32,7 @@ class Autoroku
         method_name = "#{resource.name}_#{action.name}".downcase
         define_singleton_method(method_name) do |*args|
           options          = args.first || {}
-          accepted_options = action.attributes
+          accepted_options = action.attributes.map(&:name)
           unknown_options  = options.keys.map(&:to_sym) - accepted_options.map(&:to_sym)
 
           unless unknown_options.empty?

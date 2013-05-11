@@ -33,8 +33,18 @@ describe Autoroku::Builder do
       File.read("build/lib/autoroku-test.rb")
   end
 
-  it "creates heroku/api.rb" do
-    require "./build/lib/heroku/api.rb"
-    assert Heroku::API.new.respond_to?(:foo_bar_update)
+  describe "generated API" do
+    before do
+      require "./build/lib/heroku/api.rb"
+      @api = Heroku::API.new
+    end
+
+    it "defines methods after the actions" do
+      assert @api.respond_to?(:foo_bar_update), "responds to foo_bar_update"
+    end
+
+    it "does param validation" do
+      lambda { @api.foo_bar_update }.must_raise ArgumentError
+    end
   end
 end

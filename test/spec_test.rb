@@ -18,6 +18,7 @@ describe Autoroku::Spec do
     assert_equal "PATCH", action.method
     assert_equal "/foo-bar", action.path
     assert_equal 200, action.status
-    assert_equal %w( r1 r2 o1 ), action.attributes
+    assert_equal %w( r1 r2 o1 ), action.attributes.map(&:name)
+    assert_equal [true, true, false], action.attributes.map(&:required)
   end
 end

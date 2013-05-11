@@ -21,13 +21,20 @@ class Autoroku::Spec
   def parse_resource(name, spec)
     Resource.new(name: name).tap do |resource|
       spec["actions"].each do |action, action_spec|
+        attrs = action_spec["attributes"] || {}
+        attrs_required = (attrs["required"] || [])
+        attrs_optional = (attrs["optional"] || [])
+
+        attributes = attrs_required.map { |a| Attribute.new(a, true) } +
+          attrs_optional.map { |a| Attribute.new(a, false) }
+
         resource.actions << Action.new(
           resource:   resource,
           name:       action,
           method:     action_spec["method"],
           path:       action_spec["path"],
           status:     action_spec["status"].to_i,
-          attributes: (action_spec["attributes"] || {}).values.flatten)
+          attributes: attributes)
       end
     end
   end
@@ -63,6 +70,14 @@ class Autoroku::Spec
 
     def method_name
       "#{resource.system_name}_#{system_name}"
+    end
+  end
+
+  class Attribute
+    attr_accessor :name, :required
+    def initialize(name, required)
+      @name = name
+      @required = required
     end
   end
 end
