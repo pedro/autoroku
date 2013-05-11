@@ -43,8 +43,16 @@ describe Autoroku::Builder do
       assert @api.respond_to?(:foo_bar_update), "responds to foo_bar_update"
     end
 
-    it "does param validation" do
+    it "requires params" do
       lambda { @api.foo_bar_update }.must_raise ArgumentError
+    end
+
+    it "identifies invalid params" do
+      lambda { @api.foo_bar_update(wrong: true) }.must_raise ArgumentError
+    end
+
+    it "enforces required params" do
+      lambda { @api.foo_bar_update(r1: "foo") }.must_raise ArgumentError
     end
   end
 end

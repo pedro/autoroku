@@ -104,6 +104,16 @@ module Heroku
     <% method_signature = "" %>
     <% method_signature = "(options)" unless action.attributes.empty? %>
     def <%= action.method_name %><%= method_signature %>
+      <% unless action.attributes.empty? %>
+        unknown_options = options.keys.map(&:to_sym) - <%= action.attributes.map(&:name).map(&:to_sym).inspect %>
+        raise ArgumentError, "Unknown option: #{unknown_options.inspect}" unless unknown_options.empty?
+      <% end %>
+      <% required = action.attributes.select(&:required) %>
+      <% unless required.empty? %>
+        required_options = <%= required.map(&:name).map(&:to_sym).inspect %>
+        missing_required = required_options - options.keys.map(&:to_sym)
+        raise ArgumentError, "Missing: #{missing_required.inspect}" unless missing_required.empty?
+      <% end %>
     end
   <% end %>
 <% end %>
