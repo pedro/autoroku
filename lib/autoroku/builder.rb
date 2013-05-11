@@ -16,9 +16,7 @@ class Autoroku::Builder
     create_readme
     create_gemfile
     create_gemspec
-    spec.resources.each do |resource|
-      create_resource_file(resource)
-    end
+    create_api_dot_rb
   end
 
   def create_readme
@@ -33,10 +31,8 @@ class Autoroku::Builder
     render_template("gemspec.txt.erb", "#{gem_name}.gemspec")
   end
 
-  def create_resource_file(resource)
-    render_template("resource_module.txt.erb", 
-      "lib/heroku/api/#{resource.system_name}.rb",
-      resource: resource)
+  def create_api_dot_rb
+    render_template("api.txt.erb", "lib/heroku/api.rb")
   end
 
   def render_template(template_path, destination_path, extra_vars={})
