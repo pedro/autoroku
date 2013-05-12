@@ -72,7 +72,15 @@ Perhaps more importantly, this will use the Spec to write a full Heroku API clie
 
 ```
 $ ./bin/build
-Built heroku-api-v3 0.0.1 in ./build
+Built gem in ./build/heroku-api-v3-0.0.1.gem
 ```
 
-The generated client contains a readme, Gemfile, gemspec, and all other files required to install it.
+The generated client contains a readme, Gemfile, gemspec, and all other files required to install it. You can then install the gem and release it:
+
+```
+$ gem install build/heroku-api-v3-0.0.1.gem
+Successfully installed heroku-api-v3-0.0.1
+1 gem installed
+Installing ri documentation for heroku-api-v3-0.0.1...
+Installing RDoc documentation for heroku-api-v3-0.0.1...
+```

@@ -21,6 +21,6 @@ ARGV.options do |o|
   options[:spec] = Autoroku::Spec.new(spec_path)
   builder = Autoroku::Builder.new(options)
   builder.run
-  puts "Built #{builder.gem_name} #{builder.gem_version} in ./build"
+  puts "Built gem in ./build/#{builder.gem_name}-#{builder.gem_version}.gem"
 end
 

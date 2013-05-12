@@ -18,6 +18,7 @@ class Autoroku::Builder
     create_gemspec
     create_okjson
     create_api
+    build
   end
 
   def create_readme
@@ -43,6 +44,10 @@ class Autoroku::Builder
     render_template("api.txt.erb", "lib/heroku/api.rb")
     # errors.rb
     FileUtils.copy("template/errors.rb", "build/lib/heroku/api/errors.rb")
+  end
+
+  def build
+    `cd build && gem build -V #{gem_name}.gemspec`
   end
 
   def render_template(template_path, destination_path, extra_vars={})
