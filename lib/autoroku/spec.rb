@@ -99,6 +99,7 @@ class Autoroku::Spec
 
   class Attribute
     attr_accessor :name, :required
+
     def initialize(name, required)
       @name = name
       @required = required
