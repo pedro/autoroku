@@ -13,17 +13,20 @@ spec = Autoroku::Spec.new("/path/to/doc.json")
 
 # the spec has multiple resources:
 res = spec.resources.first
-puts res.name
+res.name # => "Account"
 
 # each one with different actions:
-action = res.actions.first
-puts action.name
-puts action.path
-puts action.method
+action = res.actions.last
+action.name # => "Update"
+action.path # => "/account"
+action.method # => "PATCH"
 
 # actions have attributes:
-puts action.attributes.map(&:name)
-puts action.attributes.map(&:required?)
+action.attributes.map(&:name) # => ["allow_tracking", "beta", "email"] 
+action.attributes.map(&:required?) # => [false, false, false]
+
+# and path ids:
+action.path_ids # => ["app_id_or_name"]
 ```
 
 Lib
