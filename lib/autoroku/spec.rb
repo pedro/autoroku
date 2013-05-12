@@ -103,5 +103,9 @@ class Autoroku::Spec
       @name = name
       @required = required
     end
+
+    def required?
+      !!@required
+    end
   end
 end
