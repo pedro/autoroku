@@ -1,10 +1,9 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require "autoroku"
 
 Gem::Specification.new do |s|
   s.name        = "autoroku"
-  s.version     = Autoroku::VERSION
+  s.version     = "0.0.1"
   s.authors     = ["Pedro Belo"]
   s.email       = ["pedro@heroku.com"]
   s.homepage    = "http://github.com/heroku/autoroku"
