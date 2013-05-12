@@ -2,6 +2,7 @@
 # encoding: UTF-8
 
 require "autoroku"
+require "autoroku/lib"
 require "autoroku/cli"
 
 Autoroku::CLI.start(*ARGV)
