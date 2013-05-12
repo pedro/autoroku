@@ -21,7 +21,7 @@ module Heroku
       'Accept'                => 'application/json',
       'Accept-Encoding'       => 'gzip',
       #'Accept-Language'       => 'en-US, en;q=0.8',
-      'User-Agent'            => "heroku-rb/#{Heroku::API::VERSION}",
+      'User-Agent'            => "heroku-rb/<%= gem_version %>",
       'X-Ruby-Version'        => RUBY_VERSION,
       'X-Ruby-Platform'       => RUBY_PLATFORM
     }
