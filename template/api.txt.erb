@@ -98,22 +98,8 @@ module Heroku
 
 <% spec.resources.each do |resource| %>
   <% resource.actions.each do |action| %>
-    <%
-      method_signature = if action.path_ids.empty?
-        unless action.attributes.empty?
-          "(options)"
-        end
-      else
-        if action.attributes.empty?
-          "(#{action.path_ids.join(', ')})"
-        else
-          "(#{action.path_ids.join(', ')}, options)"
-        end
-      end
-    %>
-
     # <%= action.method %> <%= action.path %>
-    def <%= action.method_name %><%= method_signature %>
+    def <%= action.method_name %><%= action.method_signature %>
       <% unless action.attributes.empty? %>
         unknown_options = options.keys.map(&:to_sym) - <%= action.attributes.map(&:name).map(&:to_sym).inspect %>
         raise ArgumentError, "Unknown option: #{unknown_options.inspect}" unless unknown_options.empty?

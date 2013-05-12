@@ -66,6 +66,13 @@ class Autoroku::Spec
       @attributes = options[:attributes]
     end
 
+    def method_signature
+      return if path_ids.empty? && attributes.empty?
+      return "(options)" if path_ids.empty?
+      return "(#{path_ids.join(', ')})" if attributes.empty?
+      return "(#{path_ids.join(', ')}, options)"
+    end
+
     def path_ids
       ids = []
       path.gsub(/\{[\w\d-]+\}/) do |var|
