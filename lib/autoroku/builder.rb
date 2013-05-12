@@ -17,8 +17,7 @@ class Autoroku::Builder
     create_gemfile
     create_gemspec
     create_okjson
-    create_heroku_api_dot_rb
-    create_api_dot_rb
+    create_api
   end
 
   def create_readme
@@ -37,12 +36,13 @@ class Autoroku::Builder
     FileUtils.copy("template/okjson.rb", "build/lib/heroku/api/vendor/okjson.rb")
   end
 
-  def create_heroku_api_dot_rb
+  def create_api
+    # main gem file
     FileUtils.copy("template/heroku-api.rb", "build/lib/#{gem_name}.rb")
-  end
-
-  def create_api_dot_rb
+    # main api.rb
     render_template("api.txt.erb", "lib/heroku/api.rb")
+    # errors.rb
+    FileUtils.copy("template/errors.rb", "build/lib/heroku/api/errors.rb")
   end
 
   def render_template(template_path, destination_path, extra_vars={})
