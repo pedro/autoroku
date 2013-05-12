@@ -4,8 +4,9 @@ require 'rr'
 require 'webmock/minitest'
 require 'autoroku'
 require 'autoroku/cli'
-require 'autoroku/spec'
 require 'autoroku/builder'
+require 'autoroku/lib'
+require 'autoroku/spec'
 
 class MiniTest::Unit::TestCase
   include RR::Adapters::MiniTest

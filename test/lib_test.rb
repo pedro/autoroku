@@ -1,8 +1,8 @@
 require "test_helper"
 
-describe Autoroku do
+describe Autoroku::Lib do
   before do
-    @api = Autoroku.new
+    @api = Autoroku::Lib.new
     stub_request(:any, %r(https://api.heroku.com/*))
   end
 

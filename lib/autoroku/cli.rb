@@ -7,7 +7,7 @@ class Autoroku::CLI
 
   def initialize
     @key = fetch_api_key
-    @api = Autoroku.new(:api_key => @key)
+    @api = Autoroku::Lib.new(:api_key => @key)
   end
 
   def fetch_api_key
