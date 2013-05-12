@@ -8,9 +8,8 @@ Gem::Specification.new do |s|
   s.email       = ["wesley@heroku.com"]
   s.homepage    = "http://github.com/heroku/heroku.rb"
   s.summary     = %q{Ruby Client for the Heroku API}
-  s.description = %q{Ruby Client for the Heroku API}
 
-  s.files         = `git ls-files`.split("\n")
+  s.files         = `find .`.split("\n")
   s.require_paths = ["lib"]
 
   s.add_runtime_dependency 'excon', '~>0.20.0'
