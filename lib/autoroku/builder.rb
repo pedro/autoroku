@@ -12,10 +12,11 @@ class Autoroku::Builder
 
   def run
     FileUtils.rm_rf 'build'
-    FileUtils.mkdir_p 'build/lib/heroku/api'
+    FileUtils.mkdir_p 'build/lib/heroku/api/vendor'
     create_readme
     create_gemfile
     create_gemspec
+    create_okjson
     create_heroku_api_dot_rb
     create_api_dot_rb
   end
@@ -30,6 +31,10 @@ class Autoroku::Builder
 
   def create_gemspec
     render_template("gemspec.txt.erb", "#{gem_name}.gemspec")
+  end
+
+  def create_okjson
+    FileUtils.copy("template/okjson.rb", "build/lib/heroku/api/vendor/okjson.rb")
   end
 
   def create_heroku_api_dot_rb
