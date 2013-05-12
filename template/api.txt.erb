@@ -113,7 +113,7 @@ module Heroku
       request(
         :expects => <%= action.status %>,
         :method  => "<%= action.method %>",
-        :path    => "<%= action.path %>",
+        :path    => "<%= action.path_with_variables %>",
         :query   => options)
     end
 

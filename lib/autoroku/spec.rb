@@ -81,6 +81,13 @@ class Autoroku::Spec
       ids
     end
 
+    def path_with_variables
+      path.gsub(/\{[\w\d-]+\}/) do |var|
+        id = var.gsub("-", "_").gsub(/\{|\}/, "")
+        "\#\{#{id}\}"
+      end
+    end
+
     def system_name
       @name.downcase.gsub(" ", "_")
     end
