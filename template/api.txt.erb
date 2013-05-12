@@ -100,16 +100,17 @@ module Heroku
   <% resource.actions.each do |action| %>
     # <%= action.method %> <%= action.path %>
     def <%= action.method_name %><%= action.method_signature %>
-      <% unless action.attributes.empty? %>
-        unknown_options = options.keys.map(&:to_sym) - <%= action.attributes.map(&:name).map(&:to_sym).inspect %>
-        raise ArgumentError, "Unknown option: #{unknown_options.inspect}" unless unknown_options.empty?
-      <% end %>
-      <% required = action.attributes.select(&:required) %>
-      <% unless required.empty? %>
-        required_options = <%= required.map(&:name).map(&:to_sym).inspect %>
-        missing_required = required_options - options.keys.map(&:to_sym)
-        raise ArgumentError, "Missing: #{missing_required.inspect}" unless missing_required.empty?
-      <% end %>
+    <% unless action.attributes.empty? %>
+      unknown_options = options.keys.map(&:to_sym) - <%= action.attributes.map(&:name).map(&:to_sym).inspect %>
+      raise ArgumentError, "Unknown option: #{unknown_options.inspect}" unless unknown_options.empty?
+    <% end %>
+    <% required = action.attributes.select(&:required) %>
+    <% unless required.empty? %>
+      required_options = <%= required.map(&:name).map(&:to_sym).inspect %>
+      missing_required = required_options - options.keys.map(&:to_sym)
+      raise ArgumentError, "Missing: #{missing_required.inspect}" unless missing_required.empty?
+
+    <% end %>
       request(
         :expects => <%= action.status %>,
         :method  => "<%= action.method %>",
