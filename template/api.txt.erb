@@ -114,8 +114,8 @@ module Heroku
       request(
         :expects => <%= action.status %>,
         :method  => "<%= action.method %>",
-        :path    => "<%= action.path_with_variables %>",
-        :query   => options)
+        :path    => "<%= action.path_with_variables %>"<%= action.attributes.empty? ? ")" : "," %>
+        <%= ":query   => options)" unless action.attributes.empty? %>
     end
 
   <% end %>
