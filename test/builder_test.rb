@@ -2,10 +2,12 @@ require "test_helper"
 
 describe Autoroku::Builder do
   before do
-    @spec = Autoroku::Spec.new("test/resources/api.json")
-    @builder = Autoroku::Builder.new(
-      spec: @spec, name: "autoroku-test", version: "0.0.1")
-    @builder.run
+    $build_only_once ||= begin
+      @spec = Autoroku::Spec.new("test/resources/api.json")
+      @builder = Autoroku::Builder.new(
+        spec: @spec, name: "autoroku-test", version: "0.0.1")
+      @builder.run
+    end
   end
 
   it "creates a build folder" do
