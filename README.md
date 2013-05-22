@@ -96,5 +96,5 @@ $ irb -r rubygems -r heroku-api-v3
 1.9.3p125 :001 > api = Heroku::API.new(api_key: "12345")
  => #<Heroku::API:0x007ff3f31e6e20> 
 1.9.3p125 :002 > api.apps_info("blog").body
- => {"buildpack_provided_description"=>"Ruby/Rails", "created_at"=>"2012-03-09T00:40:51-00:00", "id"=>"c2b7a023-04b3-4bec-9bee-3774f3a6c29a", "git_url"=>"git@heroku.com:blog.git", "legacy_id"=>"app3188136@heroku.com", "maintenance"=>false, "name"=>"blog", "owner"=>{"email"=>"heroku@herokumanager.com", "id"=>"13048c51-de45-400f-96b8-e265f93d380f"}, "region"=>{"id"=>"59accabd-516d-4f0e-83e6-6e3757701145", "name"=>"us"}, "released_at"=>"2013-04-26T17:50:19-00:00", "repo_size"=>16715776, "slug_size"=>28573696, "stack"=>"cedar", "tier"=>"production", "updated_at"=>"2013-05-07T01:10:33-00:00", "web_url"=>"http://blog.herokuapp.com/"} 
+ => {"name" => "blog", ... }
 ```
