@@ -98,3 +98,8 @@ $ irb -r rubygems -r heroku-api-v3
 1.9.3p125 :002 > api.apps_info("blog").body
  => {"name" => "blog", ... }
 ```
+
+License
+-------
+
+Released under the [MIT License](http://www.opensource.org/licenses/MIT).
