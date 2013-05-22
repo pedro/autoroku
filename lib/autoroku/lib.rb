@@ -16,7 +16,7 @@ class Autoroku::Lib
 
     url = options[:url] || "https://api.heroku.com"
     @connection = Excon.new(url, options)
-    @spec = Autoroku::Spec.new(options[:api_spec] || "lib/api.json")
+    @spec = options[:api_spec] || Autoroku::Spec.new("lib/api.json")
     build!
   end
 

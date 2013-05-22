@@ -42,7 +42,8 @@ api.account_update(allow_tracking: false)
 It's generated on the fly based on the API definition:
 
 ```ruby
-api = Autoroku::Lib.new(:api_key => "...", :api_spec => "/path/to/doc.json")
+spec = Autoroku::Spec.new("/path/to/doc.json")
+api = Autoroku::Lib.new(:api_key => "...", :api_spec => spec)
 ```
 
 Cli
