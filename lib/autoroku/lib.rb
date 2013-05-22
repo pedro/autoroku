@@ -38,7 +38,7 @@ class Autoroku::Lib
           response = @connection.request(
             method:  action.method,
             path:    action.path,
-            expects: [action.status, 206],
+            expects: action.statuses,
             query:   options)
 
           Yajl::Parser.parse(response.body)

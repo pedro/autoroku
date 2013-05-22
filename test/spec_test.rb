@@ -17,7 +17,7 @@ describe Autoroku::Spec do
     assert_equal "Update", action.name
     assert_equal "PATCH", action.method
     assert_equal "/foo-bar/{foo-bar-id-or-name}", action.path
-    assert_equal 200, action.status
+    assert_equal [200, 206], action.statuses
     assert_equal %w( r1 r2 o1 ), action.attributes.map(&:name)
     assert_equal ["foo_bar_id_or_name"], action.path_ids
   end

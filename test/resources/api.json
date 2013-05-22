@@ -10,17 +10,17 @@
             "required": ["r1", "r2"],
             "optional": ["o1"]
           },
-          "method": "POST",
-          "path":   "/foo-bar",
-          "status": "200 OK"
+          "method":   "POST",
+          "path":     "/foo-bar",
+          "statuses": [200, 206]
         },
         "Update": {
           "attributes": {
             "optional": ["r1", "r2", "o1"]
           },
-          "method": "PATCH",
-          "path":   "/foo-bar/{foo-bar-id-or-name}",
-          "status": "200 OK"
+          "method":   "PATCH",
+          "path":     "/foo-bar/{foo-bar-id-or-name}",
+          "statuses": [200, 206]
         }
       },
       "attributes": {

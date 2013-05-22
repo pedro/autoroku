@@ -1,16 +1,19 @@
 {
   "overview": {
-    "Authentication":   "HTTP basic authentication should be supplied for each request. The value should be constructed from email address and api key as `{email}:{api-key}`. This userpass should then be base64 encoded and passed in the Authorization header, for example `Authorization: Basic 0123456789ABCDEF=`.",
-    "Caching":          "All responses include a `Last-Modified` header with a timestamp indicating the latest change to a resource. You may then use `If-Modified-Since` with this timestamp to check if further updates have occured which might require you to fetch new data. If new data does not exist, you should receive a `304 Not Modified` response. Otherwise, the request should proceed as usual.",
-    "Clients":          "Clients must address requests to `api.heroku.com` using HTTPS and specify the accept header `Accept: application/vnd.heroku+json; version=3`. Clients should specify a `User-Agent` header to facilitate tracking and debugging.",
+    "Authentication":   "HTTP basic authentication must be constructed from email address and api key as `{email-address}:{api-key}`, base64 encoded and passed as the Authorization header for each request, for example `Authorization: Basic 0123456789ABCDEF=`.",
+    "Caching":          "All responses include an `ETag` (or Entity Tag) header, identifying the specific version of a returned resource. You may use this value to check for changes to a resource by repeating the request and passing the `ETag` value in the `If-None-Match` header. If the resource has not changed, a `304 Not Modified` status will be returned with an empty body. If the resource has changed, the request will proceed normally.",
+    "Clients":          "Clients must address requests to `api.heroku.com` using HTTPS and specify the `Accept: application/vnd.heroku+json; version=3` Accept header. Clients should specify a `User-Agent` header to facilitate tracking and debugging.",
     "Curl Examples": [
-      "Curl examples are provided to facilitate experimentation as you learn the API. Any values you need to fill in yourself are represented as `$SOMETHING` so that you can set them via environment variables without editing the commands. The examples use the `-n` option to get credentials from a netrc file, rather than needing to include them each time. That file should include an entry for `api.heroku.com` similar to the following:",
+      "Curl examples are provided to facilitate experimentation. Variable values are represented as `$SOMETHING` so that you can manipulate them using environment variables. Examples use the `-n` option to fetch credentials from a `netrc` file, which should include an entry for `api.heroku.com` similar to the following:",
       "```\nmachine api.heroku.com\n  login {your-email}\n  password {your-api-key}\n```"
     ],
+    "Custom Types": [
+      { "Name": "datetime", "JSON Type": "string", "Description": "timestamp in iso8601 format" },
+      { "Name": "uuid",     "JSON Type": "string", "Description": "uuid in 8-4-4-4-12 format" }
+    ],
     "Data Integrity": [
-      "In many cases both the unique id and some other more human-friendly attribute can be used interchangably to reference a resource, for example you can use `name` or `id` to refer to an app. Though the human-friendly version may be more convenient, you should use the `id` when possible to ensure you are referencing the same resource.",
-      "You may pass the `If-Unmodified-Since` header with the `Last-Modified` header from a previous response to ensure the record you are updating has not changed since you last recieved it. If it has changed since the date provided in the `If-Unmodified-Since` header, you will recieve a `412 Precondition Failed` response, otherwise the request should proceed as usual.",
-      "Neither of these are required, but they can help ensure updates match your expectations."
+      "Both unique id and more human-friendly attributes can be used reference resources. For example you can use `name` or `id` to refer to an app. Though the human-friendly version may be more convenient, `id` should be preferred to avoid ambiguity.",
+      "You may pass the `If-Match` header with an `ETag` value from a previous response to ensure a resource has not changed since you last received it. If the resource has changed, you will receive a `412 Precondition Failed` response. If the resource has not changed, the request will proceed normally."
     ],
     "Errors":           "Failing responses will have an appropriate [status](#statuses) and a JSON body.",
     "Error Attributes": [
@@ -26,34 +29,30 @@
       { "Method": "PUT",    "Usage": "used for replacing existing objects" },
       { "Method": "POST",   "Usage": "used for creating new objects" }
     ],
-    "Parameters":       "Parameters sections detail the values that can be passed and are divided between optional and required values. The type for each value is specified as well as a default for any optional values. Values not listed are immutable. Parameters should be JSON encoded and passed in the request body.",
-    "Ranges":           "List requests will return a `Content-Range` header indicating the range of values returned. Large lists may require additional requests to retrieve. If a list response has been truncated you will receive a `206` status. You will also receive `Next-Range` and `Prev-Range` headers if there are next and previous ranges respectively. To retrieve the next or previous set of values, simply repeat the request with a `Range` header set to either the `Next-Range` or `Prev-Range` value.",
+    "Parameters":       "Values that can be provided for an action are divided between optional and required values. The expected type for each value is specified and unlisted values should be considered immutable. Parameters should be JSON encoded and passed in the request body.",
+    "Ranges":           "List requests will return a `Content-Range` header indicating the range of values returned. Large lists may require additional requests to retrieve. If a list response has been truncated you will receive a `206 Partial Content` status and one or both of `Next-Range` and `Prev-Range` headers if there are next and previous ranges respectively. To retrieve the next or previous range, repeat the request with the `Range` header set to either the `Next-Range` or `Prev-Range` value from the previous request.",
     "Rate Limits":      "The API limits the total number of hourly requests per user to allow us to protect against abuse and buggy code. When making requests you can check the <a href='#response-headers'>response headers</a> for your current rate limiting status.",
-    "Request Id":       "Each API request is given a unique id to facilitate tracking down bugs. When reporting issues agains the API, providing this value allows us to track down your particular request and facilitates fixes.",
-    "Responses":        "Response sections detail values returned by the API in two blocks. The first contains the status code and relevant headers (we have omitted common http headers). The second block contains the JSON body (if any).",
+    "Request Id":       "Each API request is given a unique request id to facilitate tracking. When reporting issues, providing this value makes it easier to pinpoint problems and provide solutions more quickly.",
+    "Responses":        "Values returned by the API are split into a section with example status code and relevant headers (with common http headers omitted) and a section with an example JSON body (if any).",
     "Response Headers": [
-      { "Header": "RateLimit-Limit", "Description": "total allowed requests per interval" },
       { "Header": "RateLimit-Remaining", "Description": "allowed requests remaining in current interval" }
     ],
     "Statuses": [
-      { "Code": 200, "Culprit": "Both",   "Description": "request succeeded" },
-      { "Code": 201, "Culprit": "Both",   "Description": "resource created, for example a new app was created or an add-on was provisioned" },
-      { "Code": 206, "Culprit": "Both",   "Description": "request succeeded, but this is only a partial response, see <a href='#ranges'>ranges</a>" },
-      { "Code": 400, "Culprit": "Client", "Description": "request invalid, validate usage and try again" },
-      { "Code": 401, "Culprit": "Client", "Description": "request not authenticated, validate credentials and try again" },
-      { "Code": 402, "Culprit": "Client", "Description": "request could not be billed, validate billing information and try again" },
-      { "Code": 403, "Culprit": "Client", "Description": "request not authorized, provided credentials do not provide access to specified resource" },
-      { "Code": 404, "Culprit": "Client", "Description": "request failed, the specified resource does not exist" },
-      { "Code": 406, "Culprit": "Client", "Description": "request failed, set <code>Accept: application/vnd.heroku+json; version=3</code> header and try again" },
-      { "Code": 416, "Culprit": "Client", "Description": "request failed, validate <code>Content-Range</code> header and try again" },
-      { "Code": 422, "Culprit": "Client", "Description": "request failed, validate parameters try again" },
-      { "Code": 429, "Culprit": "Client", "Description": "request failed, wait for rate limits to reset and try again, see <a href='#rate-limits'>rate limits</a>" },
-      { "Code": 500, "Culprit": "Heroku", "Description": "error occurred, we are notified, but contact <a href='https://help.heroku.com'>support</a> if the issue persists" },
-      { "Code": 503, "Culprit": "Heroku", "Description": "API is unavailable, check response body or <a href='https://status.heroku.com'>Heroku status</a> for details" }
-    ],
-    "Types": [
-      { "Name": "datetime", "JSON Type": "string", "Description": "timestamp in iso8601 format" },
-      { "Name": "uuid",     "JSON Type": "string", "Description": "uuid in 8-4-4-4-12 format" }
+      { "Code": 200, "Culprit": "Both",   "Id": "OK",                               "Message": "request succeeded" },
+      { "Code": 201, "Culprit": "Both",   "Id": "Created",                          "Message": "resource created, for example a new app was created or an add-on was provisioned" },
+      { "Code": 202, "Culprit": "Both",   "Id": "Accepted",                         "Message": "request accepted, but the processing has not been completed" },
+      { "Code": 206, "Culprit": "Both",   "Id": "Partial Content",                  "Message": "request succeeded, but this is only a partial response, see <a href='#ranges'>ranges</a>" },
+      { "Code": 400, "Culprit": "Client", "Id": "Bad Request",                      "Message": "request invalid, validate usage and try again" },
+      { "Code": 401, "Culprit": "Client", "Id": "Unauthorized",                     "Message": "request not authenticated, validate credentials and try again" },
+      { "Code": 402, "Culprit": "Client", "Id": "Payment Required",                 "Message": "request could not be billed, validate billing information and try again" },
+      { "Code": 403, "Culprit": "Client", "Id": "Forbidden",                        "Message": "request not authorized, provided credentials do not provide access to specified resource" },
+      { "Code": 404, "Culprit": "Client", "Id": "Not Found",                        "Message": "request failed, the specified resource does not exist" },
+      { "Code": 406, "Culprit": "Client", "Id": "Not Acceptable",                   "Message": "request failed, set <code>Accept: application/vnd.heroku+json; version=3</code> header and try again" },
+      { "Code": 416, "Culprit": "Client", "Id": "Requested Range Not Satisfiable",  "Message": "request failed, validate <code>Content-Range</code> header and try again" },
+      { "Code": 422, "Culprit": "Client", "Id": "Unprocessable Entity",             "Message": "request failed, validate parameters try again" },
+      { "Code": 429, "Culprit": "Client", "Id": "Too Many Requests",                "Message": "request failed, wait for rate limits to reset and try again, see <a href='#rate-limits'>rate limits</a>" },
+      { "Code": 500, "Culprit": "Heroku", "Id": "Internal Server Error",            "Message": "error occurred, we are notified, but contact <a href='https://help.heroku.com'>support</a> if the issue persists" },
+      { "Code": 503, "Culprit": "Heroku", "Id": "Service Unavailable",              "Message": "API is unavailable, check response body or <a href='https://status.heroku.com'>Heroku status</a> for details" }
     ]
   },
 
@@ -62,9 +61,9 @@
     "Account": {
       "actions": {
         "Info": {
-          "method": "GET",
-          "path":   "/account",
-          "status": "200 OK"
+          "method":     "GET",
+          "path":       "/account",
+          "statuses":   [200]
         },
         "Update": {
           "attributes": {
@@ -74,72 +73,71 @@
               "email"
             ]
           },
-          "method": "PATCH",
-          "path":   "/account",
-          "status": "200 OK"
+          "method":     "PATCH",
+          "path":       "/account",
+          "statuses":   [200]
         }
       },
       "attributes": {
         "allow_tracking": {
           "description":  "whether to allow web activity tracking with third-party services like Google Analytics",
           "example":      true,
+          "serialized":   true,
           "type":         "boolean"
         },
         "beta": {
           "description":  "whether to utilize beta Heroku features",
           "example":      false,
+          "serialized":   true,
           "type":         "boolean"
         },
         "confirmed": {
           "description":  "whether billing has been confirmed",
           "example":      false,
+          "serialized":   true,
           "type":         "boolean"
         },
         "created_at": {
           "description":  "when account was created",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         },
         "email": {
           "description":  "email address of account",
           "example":      "username@example.com",
+          "serialized":   true,
           "type":         "string"
         },
         "id": {
           "description":  "unique identifier of account",
           "example":      "01234567-89ab-cdef-0123-456789abcdef",
+          "serialized":   true,
           "type":         "uuid"
         },
         "last_login": {
           "description":  "when account last authorized with Heroku",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         },
         "updated_at": {
           "description":  "when account was updated",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         },
         "verified": {
           "description":  "whether email has been verified",
           "example":      false,
+          "serialized":   true,
           "type":         "boolean"
         }
       },
-      "description": "An account represents you on Heroku.",
-      "serialization": [
-        "allow_tracking",
-        "beta",
-        "confirmed",
-        "email",
-        "id",
-        "last_login",
-        "updated_at",
-        "verified"
-      ]
+      "description": "An account represents you on Heroku."
     },
 
-    "Apps": {
+    "App": {
       "actions": {
         "Create": {
           "attributes": {
@@ -152,17 +150,17 @@
           },
           "method":     "POST",
           "path":       "/apps",
-          "status":     "201 Created"
+          "statuses":   [201]
         },
         "List": {
-          "method": "GET",
-          "path":   "/apps",
-          "status": "200 OK"
+          "method":     "GET",
+          "path":       "/apps",
+          "statuses":   [200, 206]
         },
         "Info": {
-          "method": "GET",
-          "path":   "/apps/{app-id-or-name}",
-          "status": "200 OK"
+          "method":     "GET",
+          "path":       "/apps/{app-id-or-name}",
+          "statuses":   [200]
         },
         "Update": {
           "attributes": {
@@ -173,120 +171,118 @@
               "owner:id"
             ]
           },
-          "method": "PATCH",
-          "path":   "/apps/{app-id-or-name}",
-          "status": "200 OK"
+          "method":     "PATCH",
+          "path":       "/apps/{app-id-or-name}",
+          "statuses":   [200]
         },
         "Delete": {
-          "method": "DELETE",
-          "path":   "/apps/{app-id-or-name}",
-          "status": "200 OK"
+          "method":     "DELETE",
+          "path":       "/apps/{app-id-or-name}",
+          "statuses":   [200]
         }
       },
       "attributes": {
         "buildpack_provided_description": {
           "description":  "description from buildpack of app",
           "example":      "Ruby/Rack",
+          "serialized":   true,
           "type":         "string"
         },
         "created_at": {
           "description":  "when app was created",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         },
         "git_url": {
           "description":  "git repo url of app",
           "example":      "git@heroku.com/example.git",
+          "serialized":   true,
           "type":         "string"
         },
         "id": {
           "description":  "unique identifier of app",
           "example":      "01234567-89ab-cdef-0123-456789abcdef",
+          "serialized":   true,
           "type":         "uuid"
         },
         "maintenance": {
           "description":  "maintenance status of app",
           "example":      false,
+          "serialized":   true,
           "type":         "boolean"
         },
         "name": {
           "description":  "unique name of app",
           "example":      "example",
+          "serialized":   true,
           "type":         "string"
         },
         "owner:email": {
           "description":  "email address of app owner",
           "example":      "username@example.com",
+          "serialized":   true,
           "type":         "string"
         },
         "owner:id": {
           "description":  "unique identifier of app owner",
           "example":      "01234567-89ab-cdef-0123-456789abcdef",
+          "serialized":   true,
           "type":         "uuid"
         },
         "region:id": {
           "description":  "unique identifier of app region",
           "example":      "01234567-89ab-cdef-0123-456789abcdef",
+          "serialized":   true,
           "type":         "uuid"
         },
         "region:name": {
           "description":  "name of app region",
           "example":      "us",
+          "serialized":   true,
           "type":         "string"
         },
         "released_at": {
           "description":  "when app was last released",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         },
         "repo_size": {
           "description":  "app git repo size in bytes",
           "example":      1024,
+          "serialized":   true,
           "type":         "number"
         },
         "slug_size": {
           "description":  "app slug size in bytes",
           "example":      512,
+          "serialized":   true,
           "type":         "number"
         },
         "stack": {
           "description":  "stack of app",
           "example":      "cedar",
+          "serialized":   true,
           "type":         "string"
         },
         "updated_at": {
           "description":  "when app was updated",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         },
         "web_url": {
           "description":  "web url of app",
           "example":      "http://example.herokuapp.com",
+          "serialized":   true,
           "type":         "string"
         }
       },
-      "description": "An app represents the program that you would like to deploy and run on Heroku.",
-      "serialization": [
-        "buildpack_provided_description",
-        "created_at",
-        "git_url",
-        "id",
-        "maintenance",
-        "name",
-        "owner:email",
-        "owner:id",
-        "region:id",
-        "region:name",
-        "released_at",
-        "repo_size",
-        "slug_size",
-        "stack",
-        "updated_at",
-        "web_url"
-      ]
+      "description": "An app represents the program that you would like to deploy and run on Heroku."
     },
 
-    "Collaborators": {
+    "Collaborator": {
       "actions": {
         "Create": {
           "attributes": {
@@ -297,72 +293,70 @@
           },
           "method":     "POST",
           "path":       "/apps/{app-id-or-name}/collaborators",
-          "status":     "201 Created"
+          "statuses":   [201]
         },
         "List": {
-          "method": "GET",
-          "path":   "/apps/{app-id-or-name}/collaborators",
-          "status": "200 OK"
+          "method":     "GET",
+          "path":       "/apps/{app-id-or-name}/collaborators",
+          "statuses":   [200, 206]
         },
         "Info": {
-          "method": "GET",
-          "path":   "/apps/{app-id-or-name}/collaborators/{collaborator-id-or-email}",
-          "status": "200 OK"
+          "method":     "GET",
+          "path":       "/apps/{app-id-or-name}/collaborators/{collaborator-id-or-email}",
+          "statuses":   [200]
         },
         "Delete": {
-          "method": "DELETE",
-          "path":   "/apps/{app-id-or-name}/collaborators/{collaborator-id-or-email}",
-          "status": "200 OK"
+          "method":     "DELETE",
+          "path":       "/apps/{app-id-or-name}/collaborators/{collaborator-id-or-email}",
+          "statuses":   [200]
         }
       },
       "attributes": {
         "created_at": {
           "description":  "when collaborator was created",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         },
         "id": {
           "description":  "unique identifier of this collaborator",
           "example":      "01234567-89ab-cdef-0123-456789abcdef",
+          "serialized":   true,
           "type":         "uuid"
         },
         "updated_at": {
           "description":  "when collaborator was updated",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         },
         "user:email": {
           "description":  "collaborator email address",
           "example":      "collaborator@example.com",
+          "serialized":   true,
           "type":         "string"
         },
         "user:id": {
           "description":  "unique identifier of the user",
           "example":      "01234567-89ab-cdef-0123-456789abcdef",
+          "serialized":   true,
           "type":         "uuid"
         }
       },
-      "description": "Collaborators are other users who have been given access to an app on Heroku.",
-      "serialization": [
-        "created_at",
-        "id",
-        "updated_at",
-        "user:email",
-        "user:id"
-      ]
+      "description": "Collaborators are other users who have been given access to an app on Heroku."
     },
 
-    "Config Vars": {
+    "Config Var": {
       "actions": {
         "Info": {
-          "method": "GET",
-          "path":   "/apps/{app-id-or-name}/config-vars",
+          "method":     "GET",
+          "path":       "/apps/{app-id-or-name}/config-vars",
           "serialization": {
             "FOO":  "bar",
             "BAZ":  "qux",
             "QUUX": "corge"
           },
-          "status": "200 OK"
+          "statuses":   [200]
         },
         "Update": {
           "attributes": {
@@ -375,14 +369,21 @@
             "BAZ":  "grault",
             "QUUX": "corge"
           },
-          "status":     "200 OK"
+          "statuses":   [200]
         }
       },
-      "attributes": "Unlike many other resources, the attributes on config vars are based on the values you set. So you will simply get a set a key/value pairs that match your latest update.",
+      "attributes": {
+        "{key}": {
+          "description":  "key/value pair for dyno env",
+          "example":      "{value}",
+          "serialized":   true,
+          "type":         "string"
+        }
+      },
       "description": "Config Vars allow you to manage the configuration information provided to an app on Heroku."
     },
 
-    "Domains": {
+    "Domain": {
       "actions": {
         "Create": {
           "attributes": {
@@ -392,56 +393,54 @@
           },
           "method":     "POST",
           "path":       "/apps/{app-id-or-name}/domains",
-          "status":     "201 Created"
+          "statuses":   [201]
         },
         "List": {
-          "method": "GET",
-          "path":   "/apps/{app-id-or-name}/domains",
-          "status": "200 OK"
+          "method":     "GET",
+          "path":       "/apps/{app-id-or-name}/domains",
+          "statuses":   [200, 206]
         },
         "Info": {
-          "method": "GET",
-          "path":   "/apps/{app-id-or-name}/domains/{domain-id-or-domain}",
-          "status": "200 OK"
+          "method":     "GET",
+          "path":       "/apps/{app-id-or-name}/domains/{domain-id-or-hostname}",
+          "statuses":   [200]
         },
         "Delete": {
-          "method": "DELETE",
-          "path":   "/apps/{app-id-or-name}/domains/{domain-id-or-domain}",
-          "status": "200 OK"
+          "method":     "DELETE",
+          "path":       "/apps/{app-id-or-name}/domains/{domain-id-or-hostname}",
+          "statuses":   [200]
         }
       },
       "attributes": {
         "created_at": {
           "description":  "when domain was created",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         },
         "hostname": {
           "description":  "full hostname",
           "example":      "subdomain.example.com",
+          "serialized":   true,
           "type":         "string"
         },
         "id": {
           "description":  "unique identifier of this domain",
           "example":      "01234567-89ab-cdef-0123-456789abcdef",
+          "serialized":   true,
           "type":         "uuid"
         },
         "updated_at": {
           "description":  "when domain was updated",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         }
       },
-      "description": "Domains define what web routes should be routed to an app on Heroku.",
-      "serialization": [
-        "created_at",
-        "hostname",
-        "id",
-        "updated_at"
-      ]
+      "description": "Domains define what web routes should be routed to an app on Heroku."
     },
 
-    "Dynos": {
+    "Dyno": {
       "actions": {
         "Create": {
           "attributes": {
@@ -451,108 +450,106 @@
           },
           "method":     "POST",
           "path":       "/apps/{app-id-or-name}/dynos",
-          "status":     "201 Created"
+          "statuses":   [201]
         },
         "List": {
-          "method": "GET",
-          "path":   "/apps/{app-id-or-name}/dynos",
-          "status": "200 OK"
+          "method":     "GET",
+          "path":       "/apps/{app-id-or-name}/dynos",
+          "statuses":   [200, 206]
         },
         "Info": {
-          "method": "GET",
-          "path":   "/apps/{app-id-or-name}/dynos/{dyno-id-or-name}",
-          "status": "200 OK"
+          "method":     "GET",
+          "path":       "/apps/{app-id-or-name}/dynos/{dyno-id-or-name}",
+          "statuses":   [200]
         },
         "Delete": {
-          "method": "DELETE",
-          "path":   "/apps/{app-id-or-name}/dynos/{dyno-id-or-name}",
-          "status": "200 OK"
+          "method":     "DELETE",
+          "path":       "/apps/{app-id-or-name}/dynos/{dyno-id-or-name}",
+          "statuses":   [200]
         }
       },
       "attributes": {
         "attach_url": {
           "description":  "a url to stream output from for attached processes or null for non-attached processes",
           "example":      "rendezvous://rendezvous.runtime.heroku.com:5000/{rendezvous-id}",
+          "serialized":   true,
           "type":         "string"
         },
         "command": {
           "description":  "command used to start this process",
           "example":      "bash",
+          "serialized":   true,
           "type":         "string"
         },
         "created_at": {
           "description":  "when domain was created",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         },
         "id": {
           "description":  "unique identifier of this dyno",
           "example":      "01234567-89ab-cdef-0123-456789abcdef",
+          "serialized":   true,
           "type":         "uuid"
         },
         "name": {
           "description":  "the name of this process on this app",
           "example":      "run.1",
-          "type":         "string"
-        },
-        "release:name": {
-          "description":  "the name of the release this process was started with",
-          "example":      "v123",
+          "serialized":   true,
           "type":         "string"
         },
         "release:id": {
           "description":  "the unique identifier of the release this process was started with",
           "example":      "01234567-89ab-cdef-0123-456789abcdef",
+          "serialized":   true,
           "type":         "uuid"
+        },
+        "release:name": {
+          "description":  "the name of the release this process was started with",
+          "example":      "v123",
+          "serialized":   true,
+          "type":         "string"
         },
         "size": {
           "description":  "dyno size (default: 1)",
           "example":      1,
+          "serialized":   true,
           "type":         "number"
         },
         "state": {
           "description":  "current status of process (either: crashed, down, starting, or up)",
           "example":      "up",
+          "serialized":   true,
           "type":         "string"
         },
         "type": {
           "description":  "type of process",
           "example":      "run",
+          "serialized":   true,
           "type":         "string"
         },
         "updated_at": {
           "description":  "when process last changed state",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         }
       },
-      "description": "Dynos encapsulate running processes of an app on Heroku.",
-      "serialization": [
-        "attach_url",
-        "command",
-        "created_at",
-        "id",
-        "name",
-        "release:name",
-        "release:id",
-        "size",
-        "state",
-        "type",
-        "updated_at"
-      ]
+      "description": "Dynos encapsulate running processes of an app on Heroku."
     },
 
     "Formation": {
       "actions": {
         "List": {
-          "method": "GET",
-          "path":   "/apps/{app-id-or-name}/formation",
-          "status": "200 OK"
+          "method":     "GET",
+          "path":       "/apps/{app-id-or-name}/formation",
+          "statuses":   [200, 206]
         },
         "Info": {
-          "method": "GET",
-          "path":   "/apps/{app-id-or-name}/formation/{formation-id-or-process-type}",
-          "status": "200 OK"
+          "method":     "GET",
+          "path":       "/apps/{app-id-or-name}/formation/{formation-id-or-type}",
+          "statuses":   [200]
         },
         "Update": {
           "attributes": {
@@ -560,60 +557,59 @@
               "quantity"
             ]
           },
-          "method": "PATCH",
-          "path":   "/apps/{app-id-or-name}/formation/{formation-id-or-process-type}",
-          "status": "200 OK"
+          "method":     "PATCH",
+          "path":       "/apps/{app-id-or-name}/formation/{formation-id-or-type}",
+          "statuses":   [200]
         }
       },
       "attributes": {
         "command": {
           "description":  "command to use for process type",
           "example":      "bundle exec rails server -p $PORT",
+          "serialized":   true,
           "type":         "string"
         },
         "created_at": {
           "description":  "when domain was created",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         },
         "id": {
           "description":  "unique identifier of this process type",
           "example":      "01234567-89ab-cdef-0123-456789abcdef",
+          "serialized":   true,
           "type":         "uuid"
         },
         "quantity": {
           "description":  "number of processes to maintain",
           "example":      1,
+          "serialized":   true,
           "type":         "number"
         },
         "size": {
           "description":  "dyno size (default: 1)",
           "example":      1,
+          "serialized":   true,
           "type":         "number"
         },
         "type": {
           "description":  "type of process to maintain",
           "example":      "web",
+          "serialized":   true,
           "type":         "string"
         },
         "updated_at": {
           "description":  "when dyno type was updated",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         }
       },
-      "description": "The formation of processes that should be maintained for your application. Commands and types are defined by the Procfile uploaded with an app.",
-      "serialization": [
-        "command",
-        "created_at",
-        "quantity",
-        "size",
-        "type",
-        "updated_at"
-      ]
+      "description": "The formation of processes that should be maintained for your application. Commands and types are defined by the Procfile uploaded with an app."
     },
 
-    "Keys": {
+    "Key": {
       "actions": {
         "Create": {
           "attributes": {
@@ -623,215 +619,208 @@
           },
           "method":     "POST",
           "path":       "/account/keys",
-          "status":     "201 Created"
+          "statuses":   [201]
         },
         "List": {
-          "method": "GET",
-          "path":   "/account/keys",
-          "status": "200 OK"
+          "method":     "GET",
+          "path":       "/account/keys",
+          "statuses":   [200]
         },
         "Info": {
-          "method": "GET",
-          "path":   "/account/keys/{key-id-or-fingerprint}",
-          "status": "200 OK"
+          "method":     "GET",
+          "path":       "/account/keys/{key-id-or-fingerprint}",
+          "statuses":   [200]
         },
         "Delete": {
-          "method": "DELETE",
-          "path":   "/account/keys/{key-id-or-fingerprint}",
-          "status": "200 OK"
+          "method":     "DELETE",
+          "path":       "/account/keys/{key-id-or-fingerprint}",
+          "statuses":   [200]
         }
       },
       "attributes": {
         "created_at": {
           "description":  "when key was created",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         },
         "email": {
           "description":  "email address provided in key contents",
           "example":      "username@example.com",
+          "serialized":   true,
           "type":         "string"
         },
         "fingerprint": {
           "description":  "a unique identifying string based on contents",
           "example":      "17:63:a4:ba:24:d3:7f:af:17:c8:94:82:7e:80:56:bf",
+          "serialized":   true,
           "type":         "string"
         },
         "id": {
           "description":  "unique identifier of this key",
           "example":      "01234567-89ab-cdef-0123-456789abcdef",
+          "serialized":   true,
           "type":         "uuid"
         },
         "public_key": {
           "description":  "full public_key as uploaded",
           "example":      "ssh-rsa AAAAB3NzaC1ycVc/../839Uv username@example.com",
+          "serialized":   true,
           "type":         "string"
         },
         "updated_at": {
           "description":  "when key was updated",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         }
       },
-      "description": "Keys represent ssh keys associated with an account and are use to authorize you when performing git operations.",
-      "serialization": [
-        "created_at",
-        "email",
-        "fingerprint",
-        "id",
-        "public_key",
-        "updated_at"
-      ]
+      "description": "Keys represent ssh keys associated with an account and are use to authorize you when performing git operations."
     },
 
-    "Log Sessions": {
+    "Log Session": {
       "actions": {
         "Create": {
           "method":     "POST",
           "path":       "/apps/{app-id-or-name}/log-sessions",
-          "status":     "201 Created"
+          "statuses":   [201]
         }
       },
       "attributes": {
         "created_at": {
           "description":  "when log connection was created",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         },
         "id": {
           "description":  "unique identifier of this log session",
           "example":      "01234567-89ab-cdef-0123-456789abcdef",
+          "serialized":   true,
           "type":         "uuid"
         },
         "logplex_url": {
           "description":  "url for log streaming session",
           "example":      "https://logplex.heroku.com/sessions/01234567-89ab-cdef-0123-456789abcdef?srv=1325419200",
+          "serialized":   true,
           "type":         "string"
         },
         "updated_at": {
           "description":  "when log session was updated",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         }
       },
-      "description": "Log sessions provide a url to stream data from your app logs. Streaming is performed by doing an HTTP GET method on the provided logplex url and retrieving log lines utilizing chunked encoding. Sessions remain available for about 5 minutes after creation or about one hour after connecting.",
-      "serialization": [
-        "created_at",
-        "logplex_url",
-        "updated_at"
-      ]
+      "description": "Log sessions provide a url to stream data from your app logs. Streaming is performed by doing an HTTP GET method on the provided logplex url and retrieving log lines utilizing chunked encoding. Sessions remain available for about 5 minutes after creation or about one hour after connecting."
     },
 
-    "Regions": {
+    "Region": {
       "actions": {
         "List": {
-          "method": "GET",
-          "path":   "/regions",
-          "status": "200 OK"
+          "method":     "GET",
+          "path":       "/regions",
+          "statuses":   [200, 206]
         },
         "Info": {
-          "method": "GET",
-          "path":   "/regions/{region-id-or-name}",
-          "status": "200 OK"
+          "method":     "GET",
+          "path":       "/regions/{region-id-or-name}",
+          "statuses":   [200]
         }
       },
       "attributes": {
         "created_at": {
           "description":  "when region was created",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         },
         "description": {
           "description":  "description of the region",
           "example":      "United States",
+          "serialized":   true,
           "type":         "string"
         },
         "id": {
           "description":  "unique identifier of this region",
           "example":      "01234567-89ab-cdef-0123-456789abcdef",
+          "serialized":   true,
           "type":         "uuid"
         },
         "name": {
           "description":  "unique name of the region",
           "example":      "us",
+          "serialized":   true,
           "type":         "string"
         },
         "updated_at": {
           "description":  "when region was updated",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         }
       },
-      "description": "Regions represent geographic locations in which your application may run.",
-      "serialization": [
-        "created_at",
-        "description",
-        "id",
-        "name",
-        "updated_at"
-      ]
+      "description": "Regions represent geographic locations in which your application may run."
     },
 
-    "Releases": {
+    "Release": {
       "actions": {
         "List": {
-          "method": "GET",
-          "path":   "/apps/{app-id-or-name}/releases",
-          "status": "200 OK"
+          "method":     "GET",
+          "path":       "/apps/{app-id-or-name}/releases",
+          "statuses":   [200, 206]
         },
         "Info": {
-          "method": "GET",
-          "path":   "/apps/{app-id-or-name}/releases/{release-id-or-name}",
-          "status": "200 OK"
+          "method":     "GET",
+          "path":       "/apps/{app-id-or-name}/releases/{release-id-or-name}",
+          "statuses":   [200]
         }
       },
       "attributes": {
         "created_at": {
           "description":  "when release was created",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         },
         "description": {
           "description":  "description of changes in this release",
           "example":      "Added new feature",
+          "serialized":   true,
           "type":         "string"
         },
         "id": {
           "description":  "unique identifier of this release",
           "example":      "01234567-89ab-cdef-0123-456789abcdef",
+          "serialized":   true,
           "type":         "uuid"
-        },
-        "name": {
-          "description":  "unique name assigned to the release",
-          "example":      "v456",
-          "type":         "string"
         },
         "updated_at": {
           "description":  "when region was updated",
           "example":      "2012-01-01T12:00:00-00:00",
+          "serialized":   true,
           "type":         "datetime"
         },
         "user:email": {
           "description":  "email address of user that created the release",
           "example":      "username@example.com",
+          "serialized":   true,
           "type":         "string"
         },
         "user:id": {
           "description":  "unique identifier of the user that created the release",
           "example":      "01234567-89ab-cdef-0123-456789abcdef",
+          "serialized":   true,
           "type":         "uuid"
+        },
+        "version": {
+          "description":  "unique version assigned to the release",
+          "example":      456,
+          "serialized":   true,
+          "type":         "number"
         }
       },
-      "description": "A release represents a combination of code, config vars and addons for an app on Heroku.",
-      "serialization": [
-        "created_at",
-        "description",
-        "id",
-        "name",
-        "updated_at",
-        "user:email",
-        "user:id"
-      ]
+      "description": "A release represents a combination of code, config vars and addons for an app on Heroku."
     }
 
   }

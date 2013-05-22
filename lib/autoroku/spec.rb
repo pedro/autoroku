@@ -35,7 +35,7 @@ class Autoroku::Spec
           name:       action,
           method:     action_spec["method"],
           path:       action_spec["path"],
-          status:     action_spec["status"].to_i,
+          statuses:   action_spec["statuses"].map(&:to_i),
           attributes: attributes)
       end
     end
@@ -55,14 +55,14 @@ class Autoroku::Spec
   end
 
   class Action
-    attr_accessor :resource, :name, :method, :path, :status, :attributes
+    attr_accessor :resource, :name, :method, :path, :statuses, :attributes
 
     def initialize(options)
       @resource = options[:resource]
       @name     = options[:name]
       @method   = options[:method]
       @path     = options[:path]
-      @status   = options[:status]
+      @statuses = options[:statuses]
       @attributes = options[:attributes]
     end
 
