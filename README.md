@@ -1,7 +1,7 @@
 Autoroku
 ========
 
-This is a series of experiments based off the [json definition for the Heroku API](https://github.com/heroku/api/blob/master/docs/v3/doc.json).
+This is a series of experiments based off the [json definition of the Heroku API](https://gist.github.com/geemus/5623304).
 
 Spec
 ----
