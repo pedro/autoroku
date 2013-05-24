@@ -95,7 +95,7 @@ You can then test it like:
 $ irb -r rubygems -r heroku-api-v3
 1.9.3p125 :001 > api = Heroku::API.new(api_key: "12345")
  => #<Heroku::API:0x007ff3f31e6e20> 
-1.9.3p125 :002 > api.apps_info("blog").body
+1.9.3p125 :002 > api.app_info("blog").body
  => {"name" => "blog", ... }
 ```
 
